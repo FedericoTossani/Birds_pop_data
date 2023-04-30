@@ -114,8 +114,7 @@ str(data_eu)
 # Stati presi in considerazione
 stati_pres <- data_eu%>%
   distinct(country, .keep_all = F)%>%
-  arrange(country, sort = T)%>%
-  left_join(data_country, by = c("country" = "Code"))
+  arrange(country, sort = T)
 
 # L'analisi prenderà in esame i dati provenienti da 28 stati europei, elencati in tabella 1.
 # Per gli stati che comprendono isole oceaniche o territori al di fuori dei confini nazionali 
@@ -137,12 +136,71 @@ countries_rich <- countries%>%
   head(5)
 
 country_rich_sp <- data_eu%>%
-  filter(country %in% countries_rich$country)#%>%
+  filter(country %in% countries_rich$country)%>%
   distinct(speciesname, .keep_all = T)
 
 # In ordine di osservazioni gli stati con il maggior numero di dati sono:
 # Bulgaria, Spagna, Francia, Germania, Grecia.
 # Questi hanno raccolto i trend di 416 specie diverse.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
