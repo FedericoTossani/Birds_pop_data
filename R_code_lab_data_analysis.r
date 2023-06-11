@@ -35,8 +35,17 @@
 
 # Creo una lista che contiene tutti i pacchetti che mi interesanno per le successiva analisi
 
-list.of.packages <- c("tidyverse", "gridExtra", "stargazer", "lubridate", "ggthemes", "ggpubr",
-                      "gganimate", "patchwork", "gifski", "gt", "knitr")
+list.of.packages <- c("tidyverse",
+                      "gridExtra",
+                      "stargazer",
+                      "lubridate",
+                      "ggthemes",
+                      "ggpubr",
+                      "gganimate",
+                      "patchwork",
+                      "gifski",
+                      "gt",
+                      "knitr")
 
 # il seguente comando verifica che i pacchetti siano installati (se necessario li installa) poi li carica
 
@@ -129,11 +138,12 @@ countries <- data_eu%>%
   arrange(desc(n))%>%
   rename("observations" = "n")
 
+
 countries <- countries%>%
   mutate(percent = data_eu$observations/ sum(data_eu$observations))
 
-countries_rich <- countries%>%
-  head(5)
+  countries_rich <- countries%>%
+    head(5)
 
 country_rich_sp <- data_eu%>%
   filter(country %in% countries_rich$country)%>%
@@ -143,14 +153,23 @@ country_rich_sp <- data_eu%>%
 # Bulgaria, Spagna, Francia, Germania, Grecia.
 # Questi hanno raccolto i trend di 416 specie diverse.
 
+# Countries with the highest number of wintering, breeding and migrating species
 
+      top_season_countries <- data_eu%>%
+                group_by(country, season)%>%
+                distinct(speciesname, .keep_all = F)%>%
+                count(season)%>%
+                arrange(season, desc(n))%>%
+                rename("observations" = "n") # %>%
+                # filter(season == "P")       # use this filter to select the season you are interested in
 
+      print(top_season_countries, n = 92)
 
+# Let's create a barplot to visualize the situation
 
-
-
-
-
+ggplot(data=top_season_countries, aes(x=country, y=observations, fill=season)) +
+  geom_bar(stat="identity")+
+theme_light()
 
 
 
