@@ -156,7 +156,7 @@ country_rich_sp <- data_eu%>%
 # Countries with the highest number of wintering, breeding and migrating species
 
       top_season_countries <- data_eu%>%
-                group_by(country, season)%>%
+                group_by(label, season)%>%
                 distinct(speciesname, .keep_all = F)%>%
                 count(season)%>%
                 arrange(season, desc(n))%>%
@@ -167,11 +167,11 @@ country_rich_sp <- data_eu%>%
 
 # Let's create a barplot to visualize the situation
 
-ggplot(data=top_season_countries, aes(x=country, y=observations, fill=season)) +
+ggplot(data=top_season_countries, aes(x=label, y=observations, fill=season)) +
   geom_bar(stat="identity")+
 theme_light()
 
-
+# 
 
 
 
