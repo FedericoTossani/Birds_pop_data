@@ -140,7 +140,7 @@ countries <- data_eu%>%
 
 
 countries <- countries%>%
-  mutate(percent = data_eu$observations/ sum(data_eu$observations))
+  mutate(freq_cum = cumsum(data_eu$n))
 
   countries_rich <- countries%>%
     head(5)
@@ -170,6 +170,13 @@ country_rich_sp <- data_eu%>%
 ggplot(data=top_season_countries, aes(x=label, y=observations, fill=season)) +
   geom_bar(stat="identity")+
 theme_light()
+
+# Il grafico mette in evidenza 
+#
+#
+#
+#
+#
 
 # 
 
