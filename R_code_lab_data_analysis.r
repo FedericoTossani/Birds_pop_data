@@ -140,7 +140,7 @@ countries <- data_eu%>%
 
 
 countries <- countries%>%
-  mutate(freq_cum = cumsum(data_eu$n))
+  mutate(freq = observations/487*100)
 
   countries_rich <- countries%>%
     head(5)
