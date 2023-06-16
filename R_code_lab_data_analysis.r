@@ -35,152 +35,181 @@
 
 # Creo una lista che contiene tutti i pacchetti che mi interesanno per le successiva analisi
 
-list.of.packages <- c("tidyverse",
-                      "gridExtra",
-                      "stargazer",
-                      "lubridate",
-                      "ggthemes",
-                      "ggpubr",
-                      "gganimate",
-                      "patchwork",
-                      "gifski",
-                      "gt",
-                      "knitr")
+      list.of.packages <- c("tidyverse",
+                            "gridExtra",
+                            "stargazer",
+                            "lubridate",
+                            "ggthemes",
+                            "ggpubr",
+                            "gganimate",
+                            "patchwork",
+                            "gifski",
+                            "gt",
+                            "knitr")
 
 # il seguente comando verifica che i pacchetti siano installati (se necessario li installa) poi li carica
 
-{
-  new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-  
-  if(length(new.packages)) install.packages(new.packages)
-  
-  lapply(list.of.packages, require, character.only = TRUE)
-}
+      {
+        new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+
+        if(length(new.packages)) install.packages(new.packages)
+
+        lapply(list.of.packages, require, character.only = TRUE)
+      }
 
 # ---------------------------------------------------------------------------------- #
 
 #                                 2. Importazione dati
 
 # Prima di tutto imposto la working directory
-setwd("C:/Users/fedet/OneDrive/Documenti/R/lab_data_analysis/data/")
+      setwd("C:/Users/fedet/OneDrive/Documenti/R/lab_data_analysis/data/")
 
 # Ora importo i dataset che mi serviranno nel corso delle analisi
 
-data_raw <- read.csv("Article12_2020_data_birds.csv", stringsAsFactors = F)
-data_taxbirds_raw <- read.csv("Article12_2020_bird_check_list.csv", stringsAsFactors = F)
-data_country <- read.csv("Article12_2020_ref_countries.csv", stringsAsFactors = F)
+      data_raw <- read.csv("Article12_2020_data_birds.csv", stringsAsFactors = F)
+      data_taxbirds_raw <- read.csv("Article12_2020_bird_check_list.csv", stringsAsFactors = F)
+      data_country <- read.csv("Article12_2020_ref_countries.csv", stringsAsFactors = F)
 
 # uso str() per avere un'idea della struttura del data set
-str(data_raw)
-head(data_raw)
+      str(data_raw)
+      head(data_raw)
 
-str(data_taxbirds_raw)
-head(data_taxbirds_raw)
+      str(data_taxbirds_raw)
+      head(data_taxbirds_raw)
 
 # ---------------------------------------------------------------------------------- #
 
 #                                 3. Selezione dei dati
 
-data_taxbirds <- data_taxbirds_raw%>%
-  select("speciescode", "speciesname","taxOrder", "taxFamily", "taxGroup_en", "taxFamily_en")%>%
-  distinct(.keep_all = TRUE)
+      data_taxbirds <- data_taxbirds_raw%>%
+        select("speciescode", "speciesname","taxOrder", "taxFamily", "taxGroup_en", "taxFamily_en")%>%
+        distinct(.keep_all = TRUE)
 
 
 # rimuovo dal data set le variabili contenenti la sorgente dei dati
-source <- data_raw%>%
-  select(matches("_source"))%>%
-  colnames()
+      source <- data_raw%>%
+        select(matches("_source"))%>%
+        colnames()
 
 # per creare un sub set seleziono tutte le variabili di cui ho bisogno per le analisi
 # prima le reggruppo in un vettore poi con la funzione select() le seleziono dal data set iniziale
 # creo il subset del data set iniziale al quale aggiungo le variabili con le informazioni tassonomiche
 
-variable <- c("country", "season","speciescode", "speciesname", "population_date",
-              "population_size_unit", "population_size_min", "population_size_max",
-              "population_method", "population_trend_period", "population_trend",
-              "population_trend_method", "population_trend_long_period", "population_trend_long",
-              "population_trend_long_method", "use_for_statistics" )
+      variable <- c("country", "season","speciescode", "speciesname", "population_date",
+                    "population_size_unit", "population_size_min", "population_size_max",
+                    "population_method", "population_trend_period", "population_trend",
+                    "population_trend_method", "population_trend_long_period", "population_trend_long",
+                    "population_trend_long_method", "use_for_statistics" )
 
-data_eu <- data_raw%>%
-  select(-which(names(data_raw) %in% source))%>%  
-  filter(use_for_statistics == "Yes")%>%
-  select(all_of(variable))%>%
-  left_join(data_taxbirds, by = c("speciescode", "speciesname"), keep = F)%>%
-  arrange(country, speciescode)
+      data_eu <- data_raw%>%
+        select(-which(names(data_raw) %in% source))%>%  
+        filter(use_for_statistics == "Yes")%>%
+        select(all_of(variable))%>%
+        left_join(data_taxbirds, by = c("speciescode", "speciesname"), keep = F)%>%
+        arrange(country, speciescode)
 
-data_eu <- data_eu%>%
-    left_join(data_country, by = c("country" = "Code"))%>%
-    rename("country" = "Label",
-           "label" = "country")
+      data_eu <- data_eu%>%
+          left_join(data_country, by = c("country" = "Code"))%>%
+          rename("country" = "Label",
+                 "label" = "country")
 
-str(data_eu)
-# 'data.frame':	5207 obs. of  20 variables
+      str(data_eu)
+
+# Let's create a summary data frame with the range of every variables
+
+      data_eu_sum <- data_eu%>%
+          mutate_all(as.factor)%>%
+          summary()
+
+# 'data.frame':	5207 obs. of  21 variables
+
+
+
 
 # ---------------------------------------------------------------------------------- #
 
 #                                 4. Analisi dei dati
 
 # Stati presi in considerazione
-stati_pres <- data_eu%>%
-  distinct(country, .keep_all = F)%>%
-  arrange(country, sort = T)
+      stati_pres <- data_eu%>%
+        distinct(country, .keep_all = F)%>%
+        arrange(country, sort = T)
 
-# L'analisi prenderà in esame i dati provenienti da 28 stati europei, elencati in tabella 1.
-# Per gli stati che comprendono isole oceaniche o territori al di fuori dei confini nazionali 
-# è stata inserita un'ulteriore riga (Spagna, Portogallo, Regno Unito), arrivando così ad un
-# totale di 32.
+      # L'analisi prenderà in esame i dati provenienti da 28 stati europei, elencati in tabella 1.
+      # Per gli stati che comprendono isole oceaniche o territori al di fuori dei confini nazionali 
+      # è stata inserita un'ulteriore riga (Spagna, Portogallo, Regno Unito), arrivando così ad un
+      # totale di 32.
 
 # Stati con maggior diversità specifica (top 5)
-countries <- data_eu%>%
-  group_by(country)%>%
-  distinct(speciesname, .keep_all = F)%>%
-  count(country)%>%
-  arrange(desc(n))%>%
-  rename("observations" = "n")
+      
+      countries <- data_eu%>%
+        group_by(country)%>%
+        distinct(speciesname, .keep_all = F)%>%
+        count(country)%>%
+        arrange(desc(n))%>%
+        rename("observations" = "n")
 
 
-countries <- countries%>%
-  mutate(freq = observations/487*100)
+      countries <- countries%>%
+        mutate(percent= observations/487*100)
 
-  countries_rich <- countries%>%
-    head(5)
+      countries_rich <- countries%>%
+        head(5)
 
-country_rich_sp <- data_eu%>%
-  filter(country %in% countries_rich$country)%>%
-  distinct(speciesname, .keep_all = T)
+      country_rich_sp <- data_eu%>%
+        filter(country %in% countries_rich$country)%>%
+        distinct(speciesname, .keep_all = T)
 
 # In ordine di osservazioni gli stati con il maggior numero di dati sono:
 # Bulgaria, Spagna, Francia, Germania, Grecia.
 # Questi hanno raccolto i trend di 416 specie diverse.
 
+
+
 # Countries with the highest number of wintering, breeding and migrating species
 
-      top_season_countries <- data_eu%>%
-                group_by(label, season)%>%
+      season_countries <- data_eu%>%
+              # group_by(label, season)%>%
+                group_by(country, season)%>%
                 distinct(speciesname, .keep_all = F)%>%
                 count(season)%>%
                 arrange(season, desc(n))%>%
                 rename("observations" = "n") # %>%
-                # filter(season == "P")       # use this filter to select the season you are interested in
+               # filter(season == "B")       # use this filter to select the season you are interested in
 
-      print(top_season_countries, n = 92)
+      print(season_countries, n = 92)
+
+  # Top 10 countries for every season
+
+        w_10 <- season_countries%>%
+                        filter(season == "W")%>%
+                        head(10)
+        p_10 <- season_countries%>%
+                        filter(season == "P")%>%
+                        head(10)
+        b_10 <- season_countries%>%
+                        filter(season == "B")%>%
+                        head(10)
 
 # Let's create a barplot to visualize the situation
 
-ggplot(data=top_season_countries, aes(x=label, y=observations, fill=season)) +
-  geom_bar(stat="identity")+
-theme_light()
+      ggplot(data=top_season_countries, aes(x=label, y=observations, fill=season)) +
+        geom_bar(stat="identity")+
+        theme_light()
 
-# Il grafico mette in evidenza 
-#
-#
-#
-#
-#
+      # Il grafico mette in evidenza 
+      #
+      #
+      #
+      #
+      #
 
 # 
 
+# export tables to tex
 
+       b_10 %>%
+         kable(format = 'latex', booktabs = TRUE) 
 
 
 
