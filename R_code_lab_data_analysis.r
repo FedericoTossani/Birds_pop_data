@@ -45,7 +45,8 @@
                             "patchwork",
                             "gifski",
                             "gt",
-                            "knitr")
+                            "knitr",
+                            "DescTools")
 
 # il seguente comando verifica che i pacchetti siano installati (se necessario li installa) poi li carica
 
@@ -113,6 +114,12 @@
           rename("country" = "Label",
                  "label" = "country")
 
+      cols.num <- c("population_size_min","population_size_max")
+      data_eu[cols.num] <- sapply(data_eu[cols.num],as.numeric)
+      sapply(data_eu, class)
+
+      data_eu[data_eu == ""] <- NA
+
       str(data_eu)
 
 # Let's create a summary data frame with the range of every variables
@@ -123,7 +130,22 @@
 
 # 'data.frame':	5207 obs. of  21 variables
 
+data_eu_desc <- Desc(data_eu) 
 
+Desc(data_eu$population_trend, plotit=TRUE)  
+
+
+# Crea il dataframe con i nomi delle variabili
+variabili <- data.frame(NomeVariabile = names(data_eu))
+
+# Ottieni le descrizioni delle variabili utilizzando dplyr
+descrizioni <- data.frame(Descrizione = c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Codice identificativo della specie", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione. i = individui; p = pairs (coppie); cmales = maschi in canto, bfemales = femmine riproduttive; males = maschi", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione. completeSurvey = censimento completo; estimateExpert = stima basata sulla conoscienza degli esperti; estimatePartial = stima basata su una limitata quantità di dati; absentData = dato assente", "Periodo di riferimento per il trend a breve termine", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla"))
+descrizione <- c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Codice identificativo della specie", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione", "Periodo di riferimento per il trend a breve termine", "Trend nel breve periodo.", "Metodo di stima utilizzato per la popolazione nel breve periodo", "Periodo di riferimento per il trend a lungo termine", "Trend nel lungo periodo", "Metodo di stima utilizzato per la popolazione nel lungo periodo", "Dato utilizzabile a fine statistici", "Ordine tassonomico", "Famiglia tassonomica", "Gruppo tassonimico", "Famiglia tassonomica in lingua inglese", "Paese di provenienza del dato")
+
+# Combina i dataframe delle variabili e delle descrizioni
+tabella <- cbind(variabili, descrizione)
+
+PlotMiss(data_eu, main="Missing european data", clust = TRUE)
 
 
 # ---------------------------------------------------------------------------------- #
@@ -208,7 +230,7 @@
 
 # export tables to tex
 
-       b_10 %>%
+       tabella %>%
          kable(format = 'latex', booktabs = TRUE) 
 
 
