@@ -33,7 +33,7 @@
 
 #                                   1. Pacchetti
 
-# Creo una lista che contiene tutti i pacchetti che mi interesanno per le successiva analisi
+# Creo una lista che contiene tutti i pacchetti che mi interesanno per le successive analisi
 
       list.of.packages <- c("tidyverse",
                             "gridExtra",
@@ -63,16 +63,24 @@
 #                                 2. Importazione dati
 
 # Prima di tutto imposto la working directory
+
       setwd("C:/Users/fedet/OneDrive/Documenti/R/lab_data_analysis/data/")
 
 # Ora importo i dataset che mi serviranno nel corso delle analisi
 
+      # dataset con i trend delle popolazioni
       data_raw <- read.csv("Article12_2020_data_birds.csv", stringsAsFactors = F)
+
+      # dataset con i dati tassonimici
       data_taxbirds_raw <- read.csv("Article12_2020_bird_check_list.csv", stringsAsFactors = F)
+
+      # dataset con i dati degli Stati
       data_country <- read.csv("Article12_2020_ref_countries.csv", stringsAsFactors = F)
 
 # uso str() per avere un'idea della struttura del data set
       str(data_raw)
+
+# uso head() per vedere le prime righe del dataset, con l'argomento n = posso aumentare il numero di righe. tail() fa la stessa cosa con le ultime righe
       head(data_raw)
 
       str(data_taxbirds_raw)
@@ -82,19 +90,21 @@
 
 #                                 3. Selezione dei dati
 
+# seleziono le variabili che mi interessano dal dataset tassonomico e le salvo in un nuovo oggetto
+
       data_taxbirds <- data_taxbirds_raw%>%
         select("speciescode", "speciesname","taxOrder", "taxFamily", "taxGroup_en", "taxFamily_en")%>%
         distinct(.keep_all = TRUE)
 
 
-# rimuovo dal data set le variabili contenenti la sorgente dei dati
+# rimuovo dal dataset le variabili contenenti la sorgente dei dati, per una migliore visualizzazione
+
       source <- data_raw%>%
         select(matches("_source"))%>%
         colnames()
 
-# per creare un sub set seleziono tutte le variabili di cui ho bisogno per le analisi
-# prima le reggruppo in un vettore poi con la funzione select() le seleziono dal data set iniziale
-# creo il subset del data set iniziale al quale aggiungo le variabili con le informazioni tassonomiche
+
+# creo un vettore variable contenente i nomi delle variabili a cui sono interessato
 
       variable <- c("country", "season","speciescode", "speciesname", "population_date",
                     "population_size_unit", "population_size_min", "population_size_max",
@@ -118,21 +128,39 @@
       data_eu[cols.num] <- sapply(data_eu[cols.num],as.numeric)
       sapply(data_eu, class)
 
+      data_eu <- data_eu%>%
+
+
       data_eu[data_eu == ""] <- NA
 
       str(data_eu)
 
-# Let's create a summary data frame with the range of every variables
+# ---------------------------------------------------------------------------------- #
 
-      data_eu_sum <- data_eu%>%
-          mutate_all(as.factor)%>%
-          summary()
+#                                 4. Analisi descrittiva
 
-# 'data.frame':	5207 obs. of  21 variables
+# Per l'analisi descrittiva del dataset ho utilizzato la funzione Desc() del pacchetto DescTools
+# 
 
-data_eu_desc <- Desc(data_eu) 
+d.data_eu <- Desc(data_eu) 
 
-Desc(data_eu$population_trend, plotit=TRUE)  
+d.season <- Desc(data_eu$season)
+df.season <- data.matrix(d.season) 
+d.taxGroup <- Desc(data_eu$taxGroup_en, verbose="high", expected=TRUE)
+tab_taxGroup <- table(Desc(data_eu$taxGroup_en))
+
+# Correlazione tra la stagione e il gruppo tassonomico
+
+df <- data_eu%>%
+select("season", "taxGroup_en")
+Desc(tab, verbose="high", expected=TRUE)
+tab <- table(df, stringsAsFactor = T)
+
+PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
+
+desc_data_country <- Desc(data_eu$country)
+desc_data_country <- Desc(data_eu$country)
+
 
 
 # Crea il dataframe con i nomi delle variabili
@@ -230,7 +258,7 @@ PlotMiss(data_eu, main="Missing european data", clust = TRUE)
 
 # export tables to tex
 
-       tabella %>%
+       tab_data_country %>%
          kable(format = 'latex', booktabs = TRUE) 
 
 
