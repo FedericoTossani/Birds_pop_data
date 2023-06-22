@@ -141,6 +141,10 @@
 
       data_eu[data_eu == ""] <- NA
 
+# Usa questo pezzo di codice per togliere le varaibili che non sono servite alle analisi così da avere un dataset più pulito
+      data_eu <- data_eu%>%
+            select(-c("speciescode", "use_for_statistics", "taxGroup_en","taxFamily_en"))
+
       str(data_eu)
 
 # Compongo la tabella che riporta le variabili e la loro descrizione
@@ -148,7 +152,7 @@
       variabili <- data.frame(NomeVariabile = names(data_eu))
 
     # Ottieni le descrizioni delle variabili utilizzando dplyr
-      descrizione <- data.frame(Descrizione = c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Codice identificativo della specie", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione", "Periodo di riferimento per il trend a breve termine", "Trend nel breve periodo.", "Metodo di stima utilizzato per la popolazione nel breve periodo", "Periodo di riferimento per il trend a lungo termine", "Trend nel lungo periodo", "Metodo di stima utilizzato per la popolazione nel lungo periodo", "Dato utilizzabile a fine statistici", "Ordine tassonomico", "Famiglia tassonomica", "Gruppo tassonimico", "Famiglia tassonomica in lingua inglese", "Paese di provenienza del dato", "Media tra il valore massimo e il minimo della popolazione"))
+      descrizione <- data.frame(Descrizione = c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione", "Periodo di riferimento per il trend a breve termine", "Trend nel breve periodo.", "Metodo di stima utilizzato per la popolazione nel breve periodo", "Periodo di riferimento per il trend a lungo termine", "Trend nel lungo periodo", "Metodo di stima utilizzato per la popolazione nel lungo periodo", "Ordine tassonomico", "Famiglia tassonomica", "Paese di provenienza del dato", "Media tra il valore massimo e il minimo della popolazione"))
 
     # Combina i dataframe delle variabili e delle descrizioni
       tabella <- cbind(variabili, descrizione)
@@ -167,19 +171,12 @@
 # Per l'analisi descrittiva del dataset ho utilizzato la funzione Desc() del pacchetto DescTools
 # L'output della funzione è una lista in cui ogni elemento è la descrizione di una variabile del dataset inziale
 
-d.data_eu <- Desc(data_eu) 
+      d.data_eu <- Desc(data_eu) 
+      d.data_eu
 
-
-
-desc_data_country <- Desc(data_eu$country)
-desc_data_country <- Desc(data_eu$country)
-
-
-
-
-
-PlotMiss(data_eu, main="Missing european data", clust = TRUE)
-
+# Andando a modificare la variabile selezionata nel stringa seguente ottengo le statistiche per una singola varaibile
+      d.single_variable <- Desc(data_eu$country)
+      d.single_variable
 
 # ---------------------------------------------------------------------------------- #
 
@@ -191,12 +188,13 @@ PlotMiss(data_eu, main="Missing european data", clust = TRUE)
        tab_data_country %>%
          kable(format = 'latex', booktabs = TRUE) 
 
-d.season <- Desc(data_eu$season)
-df.season <- data.matrix(d.season) 
-d.taxGroup <- Desc(data_eu$taxGroup_en, verbose="high", expected=TRUE)
-tab_taxGroup <- table(Desc(data_eu$taxGroup_en))
-
 # Correlazione tra la stagione e il gruppo tassonomico
+
+      d.season <- Desc(data_eu$season)
+      df.season <- data.matrix(d.season) 
+      d.taxGroup <- Desc(data_eu$taxGroup_en, verbose="high", expected=TRUE)
+      tab_taxGroup <- table(Desc(data_eu$taxGroup_en))
+
 
 df <- data_eu%>%
 select("season", "taxGroup_en")
