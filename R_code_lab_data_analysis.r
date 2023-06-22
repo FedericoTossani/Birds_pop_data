@@ -117,6 +117,8 @@
                     "population_trend_method", "population_trend_long_period", "population_trend_long",
                     "population_trend_long_method", "use_for_statistics" )
 
+# questa parte di codice mi permette di ottenre il dataset di partenza sul quale sviluppare le successive analisi
+
       data_eu <- data_raw%>%
         select(-which(names(data_raw) %in% source))%>%  
         filter(use_for_statistics == "Yes")%>%
@@ -163,9 +165,31 @@
          kable(format = 'latex', booktabs = TRUE) 
 
 # Per l'analisi descrittiva del dataset ho utilizzato la funzione Desc() del pacchetto DescTools
-# 
+# L'output della funzione è una lista in cui ogni elemento è la descrizione di una variabile del dataset inziale
 
 d.data_eu <- Desc(data_eu) 
+
+
+
+desc_data_country <- Desc(data_eu$country)
+desc_data_country <- Desc(data_eu$country)
+
+
+
+
+
+PlotMiss(data_eu, main="Missing european data", clust = TRUE)
+
+
+# ---------------------------------------------------------------------------------- #
+
+#                                 5. Analisi di dettaglio
+
+
+# Usa questo pezzo di codice per esportare tabelle in Latex
+
+       tab_data_country %>%
+         kable(format = 'latex', booktabs = TRUE) 
 
 d.season <- Desc(data_eu$season)
 df.season <- data.matrix(d.season) 
@@ -180,26 +204,6 @@ Desc(tab, verbose="high", expected=TRUE)
 tab <- table(df, stringsAsFactor = T)
 
 PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
-
-desc_data_country <- Desc(data_eu$country)
-desc_data_country <- Desc(data_eu$country)
-
-
-
-
-
-PlotMiss(data_eu, main="Missing european data", clust = TRUE)
-
-
-# ---------------------------------------------------------------------------------- #
-
-#                                 4. Analisi dei dati
-
-
-# Usa questo pezzo di codice per esportare tabelle in Latex
-
-       tab_data_country %>%
-         kable(format = 'latex', booktabs = TRUE) 
 
 # Stati presi in considerazione
       stati_pres <- data_eu%>%
