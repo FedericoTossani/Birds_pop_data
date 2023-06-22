@@ -136,7 +136,7 @@
       sapply(data_eu, class)
 
       data_eu <- data_eu%>%
-        mutate(population_size_mean = rowMeans())
+        mutate(population_size_mean = rowMeans(data_eu[, c("population_size_min","population_size_max")]))
 
 
       data_eu[data_eu == ""] <- NA
