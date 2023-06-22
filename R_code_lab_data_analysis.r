@@ -4,15 +4,13 @@
                           # ---------------------------------- #
 
 
-# Codebook per la scrittura del report finale del corso Laboratorio di Analisi Dati (M-Z)
- 
 # Prof. Saverio Ranciati
  
 # Univesità: Alma Mater Studiorum Università di Bologna.
 
 # Anno: 2022/2023
  
-# Dataset: 
+# Dataset: Status and trends of bird populations: datasets from Article 12, Birds Directive 2009/147/EC reporting
 
 # Obiettivo del Progetto: 
 
@@ -26,7 +24,9 @@
 
 # 3. Selezione dei dati
 
-# 4. Organizzazione dei dati
+# 4. Analisi descrittiva
+
+# 5. Analisi di dettaglio
 
 
 # ---------------------------------------------------------------------------------- #
@@ -90,6 +90,11 @@
 
 #                                 3. Selezione dei dati
 
+# Usa questo pezzo di codice per esportare tabelle in Latex
+
+       tabella %>%
+         kable(format = 'latex', booktabs = TRUE) 
+
 # seleziono le variabili che mi interessano dal dataset tassonomico e le salvo in un nuovo oggetto
 
       data_taxbirds <- data_taxbirds_raw%>%
@@ -129,15 +134,33 @@
       sapply(data_eu, class)
 
       data_eu <- data_eu%>%
+        mutate(population_size_mean = rowMeans())
 
 
       data_eu[data_eu == ""] <- NA
 
       str(data_eu)
 
+# Compongo la tabella che riporta le variabili e la loro descrizione
+    # Creo il dataframe con i nomi delle variabili
+      variabili <- data.frame(NomeVariabile = names(data_eu))
+
+    # Ottieni le descrizioni delle variabili utilizzando dplyr
+      descrizione <- data.frame(Descrizione = c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Codice identificativo della specie", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione", "Periodo di riferimento per il trend a breve termine", "Trend nel breve periodo.", "Metodo di stima utilizzato per la popolazione nel breve periodo", "Periodo di riferimento per il trend a lungo termine", "Trend nel lungo periodo", "Metodo di stima utilizzato per la popolazione nel lungo periodo", "Dato utilizzabile a fine statistici", "Ordine tassonomico", "Famiglia tassonomica", "Gruppo tassonimico", "Famiglia tassonomica in lingua inglese", "Paese di provenienza del dato"))
+
+    # Combina i dataframe delle variabili e delle descrizioni
+      tabella <- cbind(variabili, descrizione)
+
+
 # ---------------------------------------------------------------------------------- #
 
 #                                 4. Analisi descrittiva
+
+
+# Usa questo pezzo di codice per esportare tabelle in Latex
+
+       tab_data_country %>%
+         kable(format = 'latex', booktabs = TRUE) 
 
 # Per l'analisi descrittiva del dataset ho utilizzato la funzione Desc() del pacchetto DescTools
 # 
@@ -163,15 +186,7 @@ desc_data_country <- Desc(data_eu$country)
 
 
 
-# Crea il dataframe con i nomi delle variabili
-variabili <- data.frame(NomeVariabile = names(data_eu))
 
-# Ottieni le descrizioni delle variabili utilizzando dplyr
-descrizioni <- data.frame(Descrizione = c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Codice identificativo della specie", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione. i = individui; p = pairs (coppie); cmales = maschi in canto, bfemales = femmine riproduttive; males = maschi", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione. completeSurvey = censimento completo; estimateExpert = stima basata sulla conoscienza degli esperti; estimatePartial = stima basata su una limitata quantità di dati; absentData = dato assente", "Periodo di riferimento per il trend a breve termine", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla", "bla"))
-descrizione <- c("Sigla identificativa dal paese", "Stagione di riferimento; B = breeding, P = passage, W = wintering", "Codice identificativo della specie", "Nome scientifico della specie", "Intervallo di tempo a cui fa rifermento la stima della popolazione", "Unità di misura per il conteggio della popolazione", "Stima minima della popolazione", "Stima massima della popolazione", "Metodo utilizzato per stimare la popolazione", "Periodo di riferimento per il trend a breve termine", "Trend nel breve periodo.", "Metodo di stima utilizzato per la popolazione nel breve periodo", "Periodo di riferimento per il trend a lungo termine", "Trend nel lungo periodo", "Metodo di stima utilizzato per la popolazione nel lungo periodo", "Dato utilizzabile a fine statistici", "Ordine tassonomico", "Famiglia tassonomica", "Gruppo tassonimico", "Famiglia tassonomica in lingua inglese", "Paese di provenienza del dato")
-
-# Combina i dataframe delle variabili e delle descrizioni
-tabella <- cbind(variabili, descrizione)
 
 PlotMiss(data_eu, main="Missing european data", clust = TRUE)
 
@@ -179,6 +194,12 @@ PlotMiss(data_eu, main="Missing european data", clust = TRUE)
 # ---------------------------------------------------------------------------------- #
 
 #                                 4. Analisi dei dati
+
+
+# Usa questo pezzo di codice per esportare tabelle in Latex
+
+       tab_data_country %>%
+         kable(format = 'latex', booktabs = TRUE) 
 
 # Stati presi in considerazione
       stati_pres <- data_eu%>%
@@ -255,11 +276,6 @@ PlotMiss(data_eu, main="Missing european data", clust = TRUE)
       #
 
 # 
-
-# export tables to tex
-
-       tab_data_country %>%
-         kable(format = 'latex', booktabs = TRUE) 
 
 
 
