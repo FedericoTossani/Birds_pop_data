@@ -175,7 +175,7 @@
       d.data_eu
 
 # Andando a modificare la variabile selezionata nel stringa seguente ottengo le statistiche per una singola varaibile
-      d.single_variable <- Desc(data_eu$country)
+      d.single_variable <- d.data_eu$population_date
       d.single_variable
 
 # ---------------------------------------------------------------------------------- #
@@ -257,6 +257,7 @@ PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
         w_10 <- season_countries%>%
                         filter(season == "W")%>%
                         head(10)
+
         p_10 <- season_countries%>%
                         filter(season == "P")%>%
                         head(10)
