@@ -202,15 +202,12 @@ orderxseason <- data_eu%>%
       ggplot(data=orderxseason, aes(x=taxOrder, y=observations, fill=season)) +
         geom_bar(stat="identity")+
         geom_text(aes(label = observations), vjust = -1)+
-        #facet_wrap(~season)+
+        facet_wrap(~season)+
         theme_light()+
         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
         labs(x = "Taxonomic order", y = "Number of observations")
 
     ggsave("OrderxSeason.jpg", plot=last_plot())
-
-
-    geom_text(aes(taxOrder, total + 20, label = n, fill = NULL), data = orderxseason)
 
 
       d.season <- Desc(data_eu$season)
@@ -283,9 +280,12 @@ PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
         p_10 <- season_countries%>%
                         filter(season == "P")%>%
                         head(10)
+
         b_10 <- season_countries%>%
                         filter(season == "B")%>%
+                        mutate(percent = (season_countries$observations/3617))%>%
                         head(10)
+Desc(data_eu$season)
 
 # Let's create a barplot to visualize the situation
 
