@@ -190,9 +190,32 @@
 
 # Correlazione tra la stagione e il gruppo tassonomico
 
+orderxseason <- data_eu%>%
+        group_by(taxOrder, season)%>%
+        #filter(taxOrder != "Passeriformes")%>%
+        count()%>%
+        rename("observations" = "n")%>%
+        arrange(desc(n))
+
+
+
+      ggplot(data=orderxseason, aes(x=taxOrder, y=observations, fill=season)) +
+        geom_bar(stat="identity")+
+        geom_text(aes(label = observations), vjust = -1)+
+        #facet_wrap(~season)+
+        theme_light()+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+        labs(x = "Taxonomic order", y = "Number of observations")
+
+    ggsave("OrderxSeason.jpg", plot=last_plot())
+
+
+    geom_text(aes(taxOrder, total + 20, label = n, fill = NULL), data = orderxseason)
+
+
       d.season <- Desc(data_eu$season)
-      df.season <- data.matrix(d.season) 
-      d.taxGroup <- Desc(data_eu$taxGroup_en, verbose="high", expected=TRUE)
+       
+      d.taxGroup <- Desc(data_eu$taxGroup_en)
       tab_taxGroup <- table(Desc(data_eu$taxGroup_en))
 
 
@@ -242,9 +265,8 @@ PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
 # Countries with the highest number of wintering, breeding and migrating species
 
       season_countries <- data_eu%>%
-              # group_by(label, season)%>%
                 group_by(country, season)%>%
-                distinct(speciesname, .keep_all = F)%>%
+                #distinct(speciesname, .keep_all = F)%>%
                 count(season)%>%
                 arrange(season, desc(n))%>%
                 rename("observations" = "n") # %>%
@@ -267,7 +289,7 @@ PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
 
 # Let's create a barplot to visualize the situation
 
-      ggplot(data=top_season_countries, aes(x=label, y=observations, fill=season)) +
+      ggplot(data=season_countries, aes(x=country, y=observations, fill=season)) +
         geom_bar(stat="identity")+
         theme_light()
 
