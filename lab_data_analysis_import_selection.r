@@ -63,6 +63,6 @@
 
 # Usa questo pezzo di codice per togliere le varaibili che non sono servite alle analisi così da avere un dataset più pulito
       data_eu <- data_eu%>%
-           # select(-c("speciescode", "use_for_statistics", "taxGroup_en","taxFamily_en"))%>%
+              select(-c("speciescode", "use_for_statistics", "taxGroup_en","taxFamily_en"))%>%
               mutate(population_trend = recode(population_trend, "Unk" = "U", "UNK" = "U"),
                      population_trend_long = recode(population_trend_long, "Unk" = "U", "UNK" = "U"))
