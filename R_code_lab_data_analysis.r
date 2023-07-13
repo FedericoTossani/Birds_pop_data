@@ -143,7 +143,9 @@
 
 # Usa questo pezzo di codice per togliere le varaibili che non sono servite alle analisi così da avere un dataset più pulito
       data_eu <- data_eu%>%
-            select(-c("speciescode", "use_for_statistics", "taxGroup_en","taxFamily_en"))
+           # select(-c("speciescode", "use_for_statistics", "taxGroup_en","taxFamily_en"))%>%
+              mutate(population_trend = recode(population_trend, "Unk" = "U", "UNK" = "U"),
+                     population_trend_long = recode(population_trend_long, "Unk" = "U", "UNK" = "U"))
 
       str(data_eu)
 
@@ -178,6 +180,10 @@
       d.single_variable <- d.data_eu$population_date
       d.single_variable
 
+      d.season <- Desc(data_eu$season)
+       
+      d.taxGroup <- Desc(data_eu$taxGroup_en)
+
 # ---------------------------------------------------------------------------------- #
 
 #                                 5. Analisi di dettaglio
@@ -210,10 +216,6 @@ orderxseason <- data_eu%>%
     ggsave("OrderxSeason.jpg", plot=last_plot())
 
 
-      d.season <- Desc(data_eu$season)
-       
-      d.taxGroup <- Desc(data_eu$taxGroup_en)
-      tab_taxGroup <- table(Desc(data_eu$taxGroup_en))
 
 
 df <- data_eu%>%
@@ -224,7 +226,7 @@ tab <- table(df, stringsAsFactor = T)
 PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
 
 # Stati presi in considerazione
-      stati_pres <- data_eu%>%
+      stati <- data_eu%>%
         distinct(country, .keep_all = F)%>%
         arrange(country, sort = T)
 
@@ -266,8 +268,7 @@ PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
                 #distinct(speciesname, .keep_all = F)%>%
                 count(season)%>%
                 arrange(season, desc(n))%>%
-                rename("observations" = "n") # %>%
-               # filter(season == "B")       # use this filter to select the season you are interested in
+                rename("observations" = "n")
 
       print(season_countries, n = 92)
 
@@ -283,7 +284,7 @@ PlotMosaic(df, main=deparse(substitute(tab)),mar=NULL)
 
         b_10 <- season_countries%>%
                         filter(season == "B")%>%
-                        mutate(percent = (season_countries$observations/3617))%>%
+                        mutate(percent = (observations/3617))%>%
                         head(10)
 Desc(data_eu$season)
 
@@ -291,23 +292,53 @@ Desc(data_eu$season)
 
       ggplot(data=season_countries, aes(x=country, y=observations, fill=season)) +
         geom_bar(stat="identity")+
-        theme_light()
-
-      # Il grafico mette in evidenza 
-      #
-      #
-      #
-      #
-      #
-
-# 
+        theme_light()+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+        labs(x = "Country", y = "Number of observations")
 
 
 
+# Trend nel breve periodo
 
+  # Breeding population
+      b_pop <- data_eu%>%
+            filter(season == "B")%>%
+            arrange(population_trend)
 
+     ggplot(data=b_pop, aes(x=country, fill=population_trend)) +
+        geom_bar(position = "fill")+
+        theme_light()+
+        #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+        labs(x = "Country")+
+        coord_flip()
 
+  # Wintering population
+      w_pop <- data_eu%>%
+            filter(season == "W")
 
+     ggplot(data=W_pop, aes(x=country, fill=population_trend)) +
+        geom_bar(stat="count")+
+        theme_light()+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+        labs(x = "Country")
+
+# Trend nel lungo periodo
+
+  # Breeding population
+
+     ggplot(data=b_pop, aes(x=country, fill=population_trend_long)) +
+        geom_bar(stat="count")+
+        theme_light()+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+        labs(x = "Country")
+
+  # Wintering population
+
+     ggplot(data=w_pop, aes(x=country, fill=population_trend_long)) +
+        geom_bar(stat="count")+
+        theme_light()+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+        labs(x = "Country")
 
 
 
