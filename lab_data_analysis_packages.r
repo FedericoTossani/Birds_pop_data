@@ -1,6 +1,7 @@
 # This is the script in which you can find all the packages used to perform the analysis
 
       list.of.packages <- c("tidyverse",
+                            "knitr",
                             "gridExtra",
                             "lubridate",
                             "DescTools")
