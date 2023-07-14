@@ -87,7 +87,7 @@
       d.data_eu
 
 # Andando a modificare la variabile selezionata nella stringa seguente ottengo le statistiche per una singola varaibile
-      d.single_variable <- d.data_eu$season
+      d.single_variable <- d.data_eu$population_trend_long_method
       d.single_variable_freq <- d.single_variable$freq
 
 # Pie chart
