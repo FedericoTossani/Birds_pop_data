@@ -78,7 +78,7 @@
 # Usa questo pezzo di codice per esportare tabelle in LaTex
 
        d.single_variable_freq %>%
-         kable(format = 'latex', booktabs = TRUE) 
+         kable(format = 'latex', booktabs = TRUE, digits = c(0, 0, 3, 3, 3)) 
 
 # Per l'analisi descrittiva del dataset ho utilizzato la funzione Desc() del pacchetto DescTools
 # L'output della funzione è una lista in cui ogni elemento è la descrizione di una variabile del dataset inziale
@@ -90,6 +90,17 @@
       d.single_variable <- d.data_eu$season
       d.single_variable_freq <- d.single_variable$freq
 
+# Pie chart
+
+ggplot(d.single_variable_freq, aes(x = "", y = perc, fill = level)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start = 0) +
+  theme_void()+
+  labs(fill = "Season")+
+  geom_text(aes(label = paste0(round(perc*100, 1),"%")), position = position_stack(vjust = 0.5))
+
+                ggsave("seasonfreq.jpg", plot=last_plot())
+
 # ---------------------------------------------------------------------------------- #
 
 #                                 4. Analisi di dettaglio
@@ -97,8 +108,12 @@
 
 # Usa questo pezzo di codice per esportare tabelle in LaTex
 
-       w_pop_trend %>%
-         kable(format = 'latex', booktabs = TRUE) 
+       d.single_variable_freq %>%
+         kable(format = 'latex', booktabs = TRUE, digits = c(0, 0, 3, 0, 3)) 
+
+      d.b_pop <- Desc(b_pop)
+      d.single_variable <- d.data_eu$population_trend
+      d.single_variable_freq <- d.single_variable$freq
 
 # 4.1 Species richness nei diversi stati europei
 
@@ -154,14 +169,16 @@
                 b_pop <- data_eu%>%
                       filter(season == "B")
 
+                b_pop_trend <- Desc(b_pop$population_trend)
+
           # Trend nei paesi
-               ggplot(data=b_pop, aes(x=country, fill=population_trend)) +
+             btb <- ggplot(data=b_pop, aes(x=country, fill=population_trend)) +
                   geom_bar(position = "fill")+
                   theme_light()+
-                  labs(x = "Country")+
+                  labs(x = "Country", fill = "Trend nel breve periodo", title = "Breeding populations")+
+                  theme(legend.position = "bottom")+
                   coord_flip()
 
-                ggsave("OrderxSeason.jpg", plot=last_plot())
 
           # Trend negli ordini tassonomici
                ggplot(data=b_pop, aes(x=taxOrder, fill=population_trend)) +
@@ -174,11 +191,14 @@
                 w_pop <- data_eu%>%
                       filter(season == "W")
 
+                w_pop_trend <- Desc(w_pop$population_trend)
+
          # Trend nei paesi
-               ggplot(data=W_pop, aes(x=country, fill=population_trend)) +
+            wtb <- ggplot(data=w_pop, aes(x=country, fill=population_trend)) +
                   geom_bar(position = "fill")+
                   theme_light()+
-                  labs(x = "Country")+
+                  labs(x = "", title = "Wintering populations")+
+                  theme(legend.position = "none")+
                   coord_flip()
 
          # Trend negli ordini tassonomici
@@ -188,29 +208,62 @@
                   labs(x = "Country")+
                   coord_flip()
 
+          # Combine the legends of the two graphs
+          combined_legend <- cowplot::get_legend(btb)
+          
+          # Remove the legends from the individual graphs
+          btb_no_legend <- btb + theme(legend.position = "none")
+          wtb_no_legend <- wtb + theme(legend.position = "none")
+          
+          # Arrange the graphs side by side with the shared legend
+          grid.arrange(
+            arrangeGrob(btb_no_legend, wtb_no_legend, ncol = 2),
+            combined_legend,
+            heights = c(1, 0.2)
+          )
+
+          ggsave("trend_breve_country.jpg", plot=arrangeGrob(arrangeGrob(btb_no_legend, wtb_no_legend, ncol = 2),combined_legend, heights = c(1, 0.2)), device = "jpeg", dpi = 300)
 
 # 4.4 Trend nel lungo periodo
 
             # Breeding population
 
-                    b_pop_trend_long <- b_pop%>%
-                              group_by(country, population_trend_long)%>%
-                              count(population_trend_long)%>%
-                              arrange(desc(country))
+                    b_pop_trend_long <- Desc(b_pop$population_trend_long)
 
-               ggplot(data=b_pop, aes(x=country, fill=population_trend_long)) +
+             btl <- ggplot(data=b_pop, aes(x=country, fill=population_trend_long)) +
                   geom_bar(position = "fill")+
                   theme_light()+
-                  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-                  labs(x = "Country")
+                  labs(x = "Country", fill = "Trend nel lungo periodo", title = "Breeding populations")+
+                  theme(legend.position = "bottom")+
+                  coord_flip()
           
             # Wintering population
-          
-               ggplot(data=w_pop, aes(x=country, fill=population_trend_long)) +
+
+                    w_pop_trend_long <- Desc(w_pop$population_trend_long)
+
+            wtl <- ggplot(data=w_pop, aes(x=country, fill=population_trend_long)) +
                   geom_bar(position = "fill")+
                   theme_light()+
-                  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-                  labs(x = "Country")
+                  labs(x = "", title = "Wintering populations")+
+                  theme(legend.position = "none")+
+                  coord_flip()
+
+          # Combine the legends of the two graphs
+          combined_legend <- cowplot::get_legend(btl)
+          
+          # Remove the legends from the individual graphs
+          btl_no_legend <- btl + theme(legend.position = "none")
+          wtl_no_legend <- wtl + theme(legend.position = "none")
+          
+          # Arrange the graphs side by side with the shared legend
+          grid.arrange(
+            arrangeGrob(btl_no_legend, wtl_no_legend, ncol = 2),
+            combined_legend,
+            heights = c(1, 0.2)
+          )
+
+          ggsave("trend_lungo_country.jpg", plot=arrangeGrob(arrangeGrob(btl_no_legend, wtl_no_legend, ncol = 2),combined_legend, heights = c(1, 0.2)), device = "jpeg", dpi = 300)
+
 
 # 4.5 Combinazioni di trend
 
